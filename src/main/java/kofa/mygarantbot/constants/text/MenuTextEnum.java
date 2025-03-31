@@ -1,6 +1,4 @@
-package kofa.mygarantbot.constants;
-
-import kofa.mygarantbot.GarantBot;
+package kofa.mygarantbot.constants.text;
 
 public enum MenuTextEnum {
     WElCOME_TEXT("Привет. Этот бот предназначен для безопасной продажи байт койнов(группа: @byteappbot)" +

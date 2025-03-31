@@ -1,4 +1,4 @@
-package kofa.mygarantbot.keyboard;
+package kofa.mygarantbot.constants.keyboard;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -181,5 +181,25 @@ public class InlineKeyboard {
         rowsInline.add(rowInline1);
         markupInline.setKeyboard(rowsInline);
         return markupInline;
+    }
+
+    public InlineKeyboardMarkup getKeyboardAcceptOrRefuse(){
+        InlineKeyboardMarkup inlineMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline1 = new ArrayList<>();
+
+        InlineKeyboardButton button1 = new InlineKeyboardButton();
+        button1.setText("Согласиться");
+        button1.setCallbackData("Accept");
+        rowInline1.add(button1);
+
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText("Отказатсья");
+        button2.setCallbackData("Refuse");
+        rowInline1.add(button2);
+
+        rowInline.add(rowInline1);
+        inlineMarkup.setKeyboard(rowInline);
+        return inlineMarkup;
     }
 }

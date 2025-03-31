@@ -1,4 +1,8 @@
 package kofa.mygarantbot.repository;
 
-public interface UsersRepository {
+import kofa.mygarantbot.model.CRM;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UsersRepository extends JpaRepository<CRM, Long> {
+    CRM findUserByUserId(Long userId);
 }

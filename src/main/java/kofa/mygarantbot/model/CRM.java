@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Traid {
+public class CRM {
     @Id
     @GeneratedValue
     private Long id;
@@ -15,4 +15,6 @@ public class Traid {
     private Long userId;
     private Long chatId;
     private String status;
+    private boolean isExchange;
+    private String traid_text;
 }

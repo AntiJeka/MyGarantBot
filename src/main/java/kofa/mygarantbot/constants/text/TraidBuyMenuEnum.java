@@ -1,6 +1,4 @@
-package kofa.mygarantbot.constants;
-
-import kofa.mygarantbot.GarantBot;
+package kofa.mygarantbot.constants.text;
 
 public enum TraidBuyMenuEnum {
 
