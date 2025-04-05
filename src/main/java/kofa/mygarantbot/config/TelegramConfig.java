@@ -11,16 +11,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Data
 public class TelegramConfig {
 
-    @Value("${bot.name}")
+    @Value("${telegram.bot-name}")
     String botName;
 
-    @Value("${bot.token}")
+    @Value("${telegram.bot-token}")
     String botToken;
 
-    @Value("${bot.webhook-path}")
+    @Value("${telegram.webhook-path}")
     String webhookPath;
-
-    @Value("${api.url}")
-    String apiURL;
 }
 

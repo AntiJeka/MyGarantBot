@@ -67,7 +67,7 @@ public final class GarantBot extends SpringWebhookBot {
         CHATTING
     }
 
-    public BotApiMethod<?> onUpdateReceived(Update update) throws IOException {
+    public BotApiMethod<?> onUpdateReceived(Update update) throws IOException{
         if(update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
 
@@ -81,10 +81,9 @@ public final class GarantBot extends SpringWebhookBot {
                 return commandHandler.commandHandler(message);
             } else if(status.equals("CHATTING")){
                 return senderService.sendMessage(message);
-            } else{
-                return new SendMessage(String.valueOf(message.getChatId()), "Error: хз честно, как ты это сделал");
             }
         }
+        return null;
 
     }
 }

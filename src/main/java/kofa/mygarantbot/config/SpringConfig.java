@@ -13,7 +13,6 @@ import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 @Configuration
 @AllArgsConstructor
 public class SpringConfig {
-
     private final TelegramConfig telegramConfig;
 
     @Bean

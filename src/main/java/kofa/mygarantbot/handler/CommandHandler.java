@@ -93,6 +93,7 @@ public class CommandHandler {
 
 
     private SendMessage getStartMessage(String chatId){
+        System.out.println("GG");
         SendMessage sendMessage = new SendMessage(chatId, MenuTextEnum.WElCOME_TEXT.getMessage());
         sendMessage.setReplyMarkup(inlineKeyboard.getKeyboardMenu());
         return sendMessage;

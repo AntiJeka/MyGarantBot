@@ -12,11 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CallbackController {
     MessageSenderService senderService;
-    /**
-     * Обрабатывает CallbackEvent от сервиса.
-     *
-     * @param callbackEvent Данные о транзакции.
-     */
+
     @PostMapping("/callback")
     public void handleCallback(@RequestBody CallbackEvent callbackEvent) {
         log.info("Получен CallbackEvent: {}", callbackEvent);
