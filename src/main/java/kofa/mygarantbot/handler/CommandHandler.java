@@ -1,11 +1,11 @@
 package kofa.mygarantbot.handler;
 
 import kofa.mygarantbot.constants.text.MenuTextEnum;
-import kofa.mygarantbot.constants.keyboard.InlineKeyboard;
+import kofa.mygarantbot.handler.keyboard.InlineKeyboard;
 import kofa.mygarantbot.model.CRM;
 import kofa.mygarantbot.model.Deal;
 import kofa.mygarantbot.telegrambot.service.MessageSenderService;
-import kofa.mygarantbot.telegrambot.impl.UserServiceImpl;
+import kofa.mygarantbot.telegrambot.service.shablon.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -20,8 +20,7 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class CommandHandler {
 
-    UserServiceImpl service;
-    InlineKeyboard inlineKeyboard;
+    private final UserService userService;
     Deal deal;
     MessageSenderService senderService;
 
@@ -60,8 +59,8 @@ public class CommandHandler {
         int dif = count_coin - (int) commision;
         int curs = (int) Math.ceil(Double.parseDouble(String.valueOf(count_coin)) / 1_000 * price);
         String str_price = String.valueOf(price);
-        CRM userSeller = service.findByUserId(Long.valueOf(chatId));
-        CRM userBuyer = service.findByUserId(userSeller.getChatId());
+        CRM userSeller = userService.findByUserId(Long.valueOf(chatId));
+        CRM userBuyer = userService.findByUserId(userSeller.getChatId());
         return String.format(
                         "%s, подтверди открытие сделки:\n" +
                         "\uD83D\uDCE5 Покупатель: %s\n" +
@@ -78,23 +77,25 @@ public class CommandHandler {
     }
 
 
-    private void registerUser(Message message){
+    private CRM registerUser(Message message){
         //Register user in database
-        CRM user = new CRM();
-        user.setUserId(message.getChatId());
-        user.setName(message.getChat().getFirstName());
-        user.setStatus("IDLE");
-        service.saveUser(user);
+        CRM user = CRM.builder()
+                .name(message.getChat().getFirstName())
+                .userId(message.getChatId())
+                .status("IDLE").build();
 
         Deal deal = new Deal();
         deal.setUserId(message.getChatId());
         deal.setExchange(false);
+        System.out.println("GG");
+        return userService.saveUser(user);
     }
 
 
     private SendMessage getStartMessage(String chatId){
-        System.out.println("GG");
+        InlineKeyboard inlineKeyboard = new InlineKeyboard();
         SendMessage sendMessage = new SendMessage(chatId, MenuTextEnum.WElCOME_TEXT.getMessage());
+        sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(inlineKeyboard.getKeyboardMenu());
         return sendMessage;
     }
@@ -103,7 +104,8 @@ public class CommandHandler {
         if (deal.getStatus().equals("CHATTING") || deal.getStatus().equals("")) {
             return  new SendMessage(chatId, "⚠️ Вы уже в диалоге! Сначала завершите текущий.");
         } else {
-            CRM user1 = service.findByUserId(Long.valueOf(chatId));
+            CRM user1 = userService.findByUserId(Long.valueOf(chatId));
+            InlineKeyboard inlineKeyboard = new InlineKeyboard();
             //Установка chatId
             Long id = null;
             try {
@@ -113,7 +115,7 @@ public class CommandHandler {
                 sendMessage.setReplyMarkup(inlineKeyboard.getKeyboardMenu());
                 return sendMessage;
             }
-            CRM user2 = service.findByUserId(id);
+            CRM user2 = userService.findByUserId(id);
             user1.setChatId(user2.getUserId());
             user2.setChatId(user1.getUserId());
 
@@ -127,8 +129,9 @@ public class CommandHandler {
 
     private SendMessage getDisconnectionMessage(String chatId){
         SendMessage sendMessage = new SendMessage(chatId, "Чат завершён");
-        CRM user1 = service.findByUserId(Long.valueOf(chatId));
-        CRM user2 = service.findByUserId(user1.getChatId());
+        CRM user1 = userService.findByUserId(Long.valueOf(chatId));
+        CRM user2 = userService.findByUserId(user1.getChatId());
+        InlineKeyboard inlineKeyboard = new InlineKeyboard();
 
         //Логика закрытия сделки
         user1.setChatId(null);
@@ -143,8 +146,9 @@ public class CommandHandler {
     }
 
     private SendMessage getTraid(String chatId, String text){
-        CRM user1 = service.findByUserId(Long.valueOf(chatId));
-        CRM user2 = service.findByUserId(user1.getChatId());
+        CRM user1 = userService.findByUserId(Long.valueOf(chatId));
+        CRM user2 = userService.findByUserId(user1.getChatId());
+        InlineKeyboard inlineKeyboard = new InlineKeyboard();
 
         user1.setTraid_text(text);
         user2.setTraid_text(text);

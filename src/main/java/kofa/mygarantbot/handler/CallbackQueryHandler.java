@@ -3,7 +3,7 @@ package kofa.mygarantbot.handler;
 import kofa.mygarantbot.GarantBot;
 import kofa.mygarantbot.constants.text.MenuTextEnum;
 import kofa.mygarantbot.constants.text.TraidBuyMenuEnum;
-import kofa.mygarantbot.constants.keyboard.InlineKeyboard;
+import kofa.mygarantbot.handler.keyboard.InlineKeyboard;
 import kofa.mygarantbot.model.CRM;
 import kofa.mygarantbot.model.Deal;
 import kofa.mygarantbot.telegrambot.service.CoinTransferService;
@@ -25,7 +25,6 @@ public class CallbackQueryHandler {
     GarantBot bot;
     MessageSenderService senderService;
     Deal deal;
-    InlineKeyboard keyboard;
 
     public BotApiMethod<?> callbackHandler(CallbackQuery callbackQuery){
         InlineKeyboard keyboard = new InlineKeyboard();
@@ -128,6 +127,7 @@ public class CallbackQueryHandler {
     private SendMessage getNoMessage(String chatId){
         CRM user1 = service.findByUserId(Long.valueOf(chatId));
         CRM user2 = service.findByUserId(user1.getChatId());
+        InlineKeyboard inlineKeyboard = new InlineKeyboard();
 
         user1.setChatId(null);
         user2.setChatId(null);
@@ -139,7 +139,7 @@ public class CallbackQueryHandler {
 
         SendMessage sendMessage = new SendMessage(String.valueOf(user2.getUserId()), TraidBuyMenuEnum.TRAID_NO.getMessage());
         senderService.sendMessage(Long.valueOf(chatId), "Вы отказались присоединятсья в чат");
-        sendMessage.setReplyMarkup(keyboard.getKeyboardMenu());
+        sendMessage.setReplyMarkup(inlineKeyboard.getKeyboardMenu());
         return sendMessage;
     }
 

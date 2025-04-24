@@ -17,7 +17,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.starter.SpringWebhookBot;
 
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +40,7 @@ public final class GarantBot extends SpringWebhookBot {
         this.commandHandler = commandHandler;
         this.tradeHandler = tradeHandler;
         this.callbackQueryHandler = callbackQueryHandler;
+        this.userServiceImpl = userServiceImpl;
     }
 
 
@@ -73,14 +73,19 @@ public final class GarantBot extends SpringWebhookBot {
 
             return callbackQueryHandler.callbackHandler(callbackQuery);
         } else {
-            Message message = update.getMessage();
-            CRM user = userServiceImpl.findByUserId(message.getChatId());
-            String status = user.getStatus();
+            if (update.hasMessage()) {
+                Message message = update.getMessage();
+                if (message.getText().equals("/start")){
+                    return commandHandler.commandHandler(message);
+                }
+                CRM user = userServiceImpl.findByUserId(message.getChatId());
+                String status = user.getStatus();
 
-            if(message.getText().startsWith("/")){
-                return commandHandler.commandHandler(message);
-            } else if(status.equals("CHATTING")){
-                return senderService.sendMessage(message);
+                if (message.getText().startsWith("/")) {
+                    return commandHandler.commandHandler(message);
+                } else if (status.equals("CHATTING")) {
+                    return senderService.sendMessage(message);
+                }
             }
         }
         return null;

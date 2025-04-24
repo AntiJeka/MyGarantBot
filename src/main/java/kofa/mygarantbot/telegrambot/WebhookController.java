@@ -1,4 +1,4 @@
-package kofa.mygarantbot.telegrambot.Controller;
+package kofa.mygarantbot.telegrambot;
 
 import kofa.mygarantbot.GarantBot;
 import lombok.AllArgsConstructor;

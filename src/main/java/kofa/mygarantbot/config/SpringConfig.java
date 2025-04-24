@@ -5,6 +5,7 @@ import kofa.mygarantbot.handler.CallbackQueryHandler;
 import kofa.mygarantbot.handler.CommandHandler;
 import kofa.mygarantbot.handler.TradeHandler;
 import kofa.mygarantbot.telegrambot.impl.UserServiceImpl;
+import kofa.mygarantbot.telegrambot.service.shablon.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +23,8 @@ public class SpringConfig {
 
     @Bean
     public GarantBot springWebhookBot(SetWebhook setWebhook, TradeHandler tradeHandler, CallbackQueryHandler callbackQueryHandler,
-                                      CommandHandler commandHandler, UserServiceImpl userServiceImpl) {
-        GarantBot bot = new GarantBot(setWebhook, tradeHandler, callbackQueryHandler, commandHandler, userServiceImpl);
+                                      CommandHandler commandHandler, UserService userService) {
+        GarantBot bot = new GarantBot(setWebhook, tradeHandler, callbackQueryHandler, commandHandler, (UserServiceImpl) userService);
 
         bot.setBotPath(telegramConfig.getWebhookPath());
         bot.setBotUsername(telegramConfig.getBotName());

@@ -1,16 +1,18 @@
 package kofa.mygarantbot.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Table
+@Builder
 public class CRM {
     @Id
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private int id;
     private String name;
     private Long userId;
     private Long chatId;
