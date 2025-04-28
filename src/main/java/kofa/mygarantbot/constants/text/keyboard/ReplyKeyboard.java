@@ -1,4 +1,4 @@
-package kofa.mygarantbot.handler.keyboard;
+package kofa.mygarantbot.constants.text.keyboard;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;

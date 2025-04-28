@@ -1,14 +1,14 @@
 package kofa.mygarantbot.handler;
 
-import kofa.mygarantbot.GarantBot;
 import kofa.mygarantbot.constants.text.MenuTextEnum;
 import kofa.mygarantbot.constants.text.TraidBuyMenuEnum;
-import kofa.mygarantbot.handler.keyboard.InlineKeyboard;
+import kofa.mygarantbot.constants.text.keyboard.InlineKeyboard;
 import kofa.mygarantbot.model.CRM;
 import kofa.mygarantbot.model.Deal;
 import kofa.mygarantbot.telegrambot.service.CoinTransferService;
-import kofa.mygarantbot.telegrambot.impl.UserServiceImpl;
-import kofa.mygarantbot.telegrambot.service.MessageSenderService;
+import kofa.mygarantbot.telegrambot.service.SendUserMessage;
+import kofa.mygarantbot.telegrambot.service.shablon.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -19,31 +19,31 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 @Component
+@RequiredArgsConstructor
 public class CallbackQueryHandler {
 
-    UserServiceImpl service;
-    GarantBot bot;
-    MessageSenderService senderService;
+    private final UserService service;
+    private final SendUserMessage sendUserMessage;
     Deal deal;
 
     public BotApiMethod<?> callbackHandler(CallbackQuery callbackQuery){
         InlineKeyboard keyboard = new InlineKeyboard();
-        String chatId = callbackQuery.getId();
+        String chatId = String.valueOf(callbackQuery.getMessage().getChatId());
         String userText = callbackQuery.getData();
-
-        CRM user = service.findByUserId(Long.valueOf(chatId));
 
         if(userText.equalsIgnoreCase("Вопросы")) {
             SendMessage sendMessage = new SendMessage(chatId, MenuTextEnum.MENU_QUESTIONS.getMessage());
             sendMessage.setReplyMarkup(keyboard.getKeyboardQuestionsMenu());
             return sendMessage;
         } else if(userText.equals("Сделка")){
-            SendMessage sendMessage = new SendMessage(chatId, MenuTextEnum.TRAID_TEXT.getMessage());
+            SendMessage sendMessage = new SendMessage(chatId, MenuTextEnum.TRAID_TEXT.getMessage() + " <code>" + chatId + "</code>");
+            sendMessage.setParseMode("HTML");
             sendMessage.setReplyMarkup(keyboard.getKeyboardTraid());
             return sendMessage;
         } else if(userText.equals("Вернуться в главное меню")){
             SendMessage sendMessage = new SendMessage(chatId, "Главное меню");
             sendMessage.setReplyMarkup(keyboard.getKeyboardMenu());
+            return sendMessage;
         } else if(userText.equals("Назад")){
             SendMessage sendMessage = new SendMessage(chatId, MenuTextEnum.MENU_QUESTIONS.getMessage());
             sendMessage.setReplyMarkup(keyboard.getKeyboardQuestionsMenu());
@@ -60,8 +60,6 @@ public class CallbackQueryHandler {
             return getYesMessage(chatId);
         } else if(userText.equals("No")){
             return getNoMessage(chatId);
-        } else if(userText.equals("Перевёл койны")){
-            //System.out.println("good");
         } else if(userText.equals("Accept")){
             return getAcceptMessage(chatId);
         } else if(userText.equals("Refuse")){
@@ -117,16 +115,15 @@ public class CallbackQueryHandler {
 //    }
 
     private SendMessage getYesMessage(String chatId){
-        CRM user = service.findByUserId(Long.valueOf(chatId));
-        deal.getDiscussion().put(user.getUserId(), user.getChatId());
+        CRM user = service.findByUserid(Long.valueOf(chatId));
 
-        senderService.sendMessage(user.getChatId(), TraidBuyMenuEnum.TRAID_DEAL.getMessage());
+        sendUserMessage.sendMessage(user.getChatId(), TraidBuyMenuEnum.TRAID_DEAL.getMessage());
         return new SendMessage(chatId, TraidBuyMenuEnum.TRAID_DEAL.getMessage());
     }
 
     private SendMessage getNoMessage(String chatId){
-        CRM user1 = service.findByUserId(Long.valueOf(chatId));
-        CRM user2 = service.findByUserId(user1.getChatId());
+        CRM user1 = service.findByUserid(Long.valueOf(chatId));
+        CRM user2 = service.findByUserid(user1.getChatId());
         InlineKeyboard inlineKeyboard = new InlineKeyboard();
 
         user1.setChatId(null);
@@ -138,13 +135,13 @@ public class CallbackQueryHandler {
         deal.setStatus("IDLE");
 
         SendMessage sendMessage = new SendMessage(String.valueOf(user2.getUserId()), TraidBuyMenuEnum.TRAID_NO.getMessage());
-        senderService.sendMessage(Long.valueOf(chatId), "Вы отказались присоединятсья в чат");
+        sendUserMessage.sendMessage(Long.valueOf(chatId), "Вы отказались присоединятсья в чат");
         sendMessage.setReplyMarkup(inlineKeyboard.getKeyboardMenu());
         return sendMessage;
     }
 
     private BotApiMethod<?> getAcceptMessage(String chatId) {
-        CRM userSeller = service.findByUserId(Long.valueOf(chatId));
+        CRM userSeller = service.findByUserid(Long.valueOf(chatId));
         String text = giveMeCoin(userSeller);
         deal.setExchange(true);
 
@@ -152,20 +149,20 @@ public class CallbackQueryHandler {
     }
 
     private BotApiMethod<?> getRefuseMessage(String chatId) {
-        CRM userBuyer = service.findByUserId(Long.valueOf(chatId));
-        CRM userSeller = service.findByUserId(userBuyer.getChatId());
+        CRM userBuyer = service.findByUserid(Long.valueOf(chatId));
+        CRM userSeller = service.findByUserid(userBuyer.getChatId());
 
         userSeller.setExchange(false);
         userBuyer.setExchange(false);
         userSeller.setTraid_text(null);
         userBuyer.setTraid_text(null);
 
-        senderService.sendMessage(userSeller.getUserId(), TraidBuyMenuEnum.TRAID_REFUSE_BUYER.getMessage());
+        sendUserMessage.sendMessage(userSeller.getUserId(), TraidBuyMenuEnum.TRAID_REFUSE_BUYER.getMessage());
         return new SendMessage(String.valueOf(userBuyer.getUserId()), TraidBuyMenuEnum.TRAID_REFUSE_BUYER.getMessage());
     }
 
     private BotApiMethod<?> getSendMoneyMessage(String chatId){
-        CRM userSeller = service.findByUserId(Long.valueOf(chatId));
+        CRM userSeller = service.findByUserid(Long.valueOf(chatId));
         String traidText = userSeller.getTraid_text();
         String[] list = traidText.split(" ");
 
@@ -182,7 +179,7 @@ public class CallbackQueryHandler {
         boolean transferSuccess = transferService.transferCoins(recipientUserId, finalAmount);
 
         // Формируем сообщение для пользователя
-        CRM userBuyer = service.findByUserId(recipientUserId);
+        CRM userBuyer = service.findByUserid(recipientUserId);
         String message;
         if (transferSuccess) {
             message = "\uD83D\uDFE2 Сделка закрыта\n\n" +
@@ -193,7 +190,7 @@ public class CallbackQueryHandler {
         }
 
         // Отправляем сообщение
-        senderService.sendMessage(userBuyer.getUserId(), message);
+        sendUserMessage.sendMessage(userBuyer.getUserId(), message);
         return new SendMessage(String.valueOf(userSeller.getUserId()), message);
     }
 }

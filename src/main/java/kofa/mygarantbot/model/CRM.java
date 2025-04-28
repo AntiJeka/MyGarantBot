@@ -14,6 +14,7 @@ public class CRM {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int id;
     private String name;
+    @Column(unique = true, nullable = false)
     private Long userId;
     private Long chatId;
     private String status;

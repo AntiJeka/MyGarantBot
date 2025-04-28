@@ -6,7 +6,6 @@ import kofa.mygarantbot.handler.CallbackQueryHandler;
 import kofa.mygarantbot.handler.TradeHandler;
 import kofa.mygarantbot.model.CRM;
 import kofa.mygarantbot.telegrambot.impl.UserServiceImpl;
-import kofa.mygarantbot.telegrambot.service.MessageSenderService;
 import lombok.Getter;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -31,7 +30,6 @@ public final class GarantBot extends SpringWebhookBot {
     TradeHandler tradeHandler;
     CallbackQueryHandler callbackQueryHandler;
     CommandHandler commandHandler;
-    MessageSenderService senderService;
     UserServiceImpl userServiceImpl;
 
     public GarantBot(SetWebhook setWebhook, TradeHandler tradeHandler, CallbackQueryHandler callbackQueryHandler,
@@ -70,7 +68,6 @@ public final class GarantBot extends SpringWebhookBot {
     public BotApiMethod<?> onUpdateReceived(Update update) throws IOException{
         if(update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
-
             return callbackQueryHandler.callbackHandler(callbackQuery);
         } else {
             if (update.hasMessage()) {
@@ -78,17 +75,18 @@ public final class GarantBot extends SpringWebhookBot {
                 if (message.getText().equals("/start")){
                     return commandHandler.commandHandler(message);
                 }
-                CRM user = userServiceImpl.findByUserId(message.getChatId());
+                CRM user = userServiceImpl.findByUserid(message.getChatId());
                 String status = user.getStatus();
 
                 if (message.getText().startsWith("/")) {
                     return commandHandler.commandHandler(message);
                 } else if (status.equals("CHATTING")) {
-                    return senderService.sendMessage(message);
+                    SendMessage sendMessage = new SendMessage(String.valueOf(user.getChatId()), message.getText());
+                    return sendMessage;
                 }
             }
         }
         return null;
-
     }
+
 }

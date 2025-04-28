@@ -1,8 +1,7 @@
 package kofa.mygarantbot.telegrambot.Controller;
 
 import kofa.mygarantbot.CallbackEvent;
-import kofa.mygarantbot.GarantBot;
-import kofa.mygarantbot.telegrambot.service.MessageSenderService;
+import kofa.mygarantbot.telegrambot.service.SendUserMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 public class CallbackController {
-    MessageSenderService senderService;
+    SendUserMessage sendUserMessage;
 
     @PostMapping("/callback")
     public void handleCallback(@RequestBody CallbackEvent callbackEvent) {
@@ -22,7 +21,7 @@ public class CallbackController {
             log.info("Получен перевод от пользователя {}: {} койнов",
                     callbackEvent.getUserId(), callbackEvent.getSum());
 
-            senderService.sendMessage(callbackEvent.getUserId(), "Получен перевод");
+            sendUserMessage.sendMessage(callbackEvent.getUserId(), "Получен перевод");
             // Дополнительная логика обработки перевода
         }
     }

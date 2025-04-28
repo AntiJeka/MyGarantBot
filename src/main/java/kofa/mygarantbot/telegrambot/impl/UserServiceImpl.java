@@ -15,13 +15,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public CRM saveUser(CRM user) {
-        System.out.println("GG");
         return repository.save(user);
     }
 
     @Override
-    public CRM findByUserId(Long userId) {
-        return repository.findUserByUserId(userId);
+    public CRM findByUserid(Long userId) {
+        return repository.findByUserId(userId);
     }
 
     @Override
